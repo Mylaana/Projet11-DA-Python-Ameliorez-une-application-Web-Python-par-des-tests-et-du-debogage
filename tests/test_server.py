@@ -5,17 +5,6 @@ import server
 from .fixtures import app, captured_template, client
 
 
-
-"""
-running coverage report :
-coverage run -m pytest
-coverage report -m
-
-set FLASK_APP=main.py
-$env:FLASK_APP = "main.py"
-flask run
-"""
-
 # ======================================================================
 # UNIT TESTS
 # ======================================================================
