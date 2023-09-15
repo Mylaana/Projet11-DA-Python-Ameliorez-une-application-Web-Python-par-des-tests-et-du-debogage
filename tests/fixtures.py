@@ -15,7 +15,12 @@ app.config['TESTING']=True
 
 @pytest.fixture
 def app():
-    return server.app
+    app = server.app
+    # adding configuration for testing purpose, providing app and server info for app_context
+    app.config['SERVER_NAME'] = 'localhost:5000'
+    app.config['APPLICATION_ROOT'] = '/'
+    app.config['PREFERRED_URL_SCHEME'] = 'http'
+    return app
 
 @pytest.fixture
 def captured_template(app):

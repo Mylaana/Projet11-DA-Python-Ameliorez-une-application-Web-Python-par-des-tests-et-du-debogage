@@ -1,13 +1,19 @@
 """testing server functions"""
-import server
-import pytest
-from .fixtures import app, captured_template, client
 from unittest.mock import patch
+from flask import url_for
+import server
+from .fixtures import app, captured_template, client
+
+
 
 """
 running coverage report :
 coverage run -m pytest
 coverage report -m
+
+set FLASK_APP=main.py
+$env:FLASK_APP = "main.py"
+flask run
 """
 
 # ======================================================================
@@ -78,10 +84,9 @@ def test_book(client, captured_template):
     assert context['competition']['name'] == 'Spring Festival'
 
 @patch('server.clubs', [])
-def test_book_club_not_found(client, captured_template):
+def test_book_club_not_found(client):
     response = client.get("book/notfound/Simply Lift")
     assert response.status_code == 200
-
 
 @patch('server.competitions', [])
 def test_book_competitions_not_found(client):
@@ -94,11 +99,30 @@ def test_book_nothing_found(client):
     response = client.get("book/not found/not found")
     assert response.status_code == 200
 
-def test_logout(client, captured_template):
-    response = client.get("/logout")
+
+def test_purchase_places(client, captured_template):
+    club = ["Simply Lift"]
+    competition = ["Spring Festival"]
+    places_before = 25
+    places_bought = 3
+    data = {"club": club, "competition": competition, "places": places_bought}
+
+    response = client.post("/purchasePlaces", data=data)
+    expected_value = places_before - places_bought
+
     template, context = captured_template[0]
     assert response.status_code == 200
-    assert len(captured_template) == 1
-    assert template.name == "index.html"
+    assert expected_value == context['competitions'][0]['numberOfPlaces']
+    assert template.name == 'welcome.html'
 
-# peut etre on peut passer email en arg pour le sad path de book
+def test_logout(client, captured_template, app):
+    response = client.get("/logout")
+    assert response.status_code == 302
+
+    with app.app_context():
+        redirect_response = client.get(url_for("logout"), follow_redirects=True)
+
+        template, context = captured_template[0]
+        assert redirect_response.status_code == 200
+        assert len(captured_template) == 1
+        assert template.name == "index.html"
