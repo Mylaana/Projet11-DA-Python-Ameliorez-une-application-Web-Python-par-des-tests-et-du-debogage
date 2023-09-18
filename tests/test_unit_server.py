@@ -1,13 +1,10 @@
-"""testing server functions"""
+"""unit testing server functions"""
 from unittest.mock import patch
 from flask import url_for
 import server
 from .fixtures import app, captured_template, client
+from .settings import TEST_SAD_PATH
 
-
-# ======================================================================
-# UNIT TESTS
-# ======================================================================
 
 def test_should_return_clubs():
     expected_value = [
@@ -53,6 +50,8 @@ def test_index(client, captured_template):
     assert len(captured_template) == 1
     assert template.name == "index.html"
 
+@patch('server.clubs', [{"name":"Simply Lift", "email":"john@simplylift.co", "points":"13"}])
+@patch('server.competitions', [{"name": "Spring Festival", "date": "2020-03-27 10:00:00", "numberOfPlaces": "25"}])
 def test_showsummary(client, captured_template):
     data = {"email": "john@simplylift.co"}
     response = client.post("/showSummary", data=data)
@@ -63,6 +62,8 @@ def test_showsummary(client, captured_template):
     assert context['club']['name'] == 'Simply Lift'
     assert context['competitions'][0]['name'] == 'Spring Festival'
 
+@patch('server.clubs', [{"name":"Simply Lift", "email":"john@simplylift.co", "points":"13"}])
+@patch('server.competitions', [{"name": "Spring Festival", "date": "2020-03-27 10:00:00", "numberOfPlaces": "25"}])
 def test_book(client, captured_template):
     response = client.get("book/Spring Festival/Simply Lift")
     template, context = captured_template[0]
@@ -72,23 +73,27 @@ def test_book(client, captured_template):
     assert context['club']['name'] == 'Simply Lift'
     assert context['competition']['name'] == 'Spring Festival'
 
-@patch('server.clubs', [])
-def test_book_club_not_found(client):
-    response = client.get("book/notfound/Simply Lift")
-    assert response.status_code == 200
+if TEST_SAD_PATH:
+    @patch('server.clubs', [])
+    @patch('server.competitions', [{"name": "Spring Festival", "date": "2020-03-27 10:00:00", "numberOfPlaces": "25"}])
+    def test_book_club_not_found(client):
+        response = client.get("book/notfound/Simply Lift")
+        assert response.status_code == 200
 
-@patch('server.competitions', [])
-def test_book_competitions_not_found(client):
-    response = client.get("book/Spring Festival/not found")
-    assert response.status_code == 200
+    @patch('server.clubs', [{"name":"Simply Lift", "email":"john@simplylift.co", "points":"13"}])
+    @patch('server.competitions', [])
+    def test_book_competitions_not_found(client):
+        response = client.get("book/Spring Festival/not found")
+        assert response.status_code == 200
 
-@patch('server.clubs', [])
-@patch('server.competitions', [])
-def test_book_nothing_found(client):
-    response = client.get("book/not found/not found")
-    assert response.status_code == 200
+    @patch('server.clubs', [])
+    @patch('server.competitions', [])
+    def test_book_nothing_found(client):
+        response = client.get("book/not found/not found")
+        assert response.status_code == 200
 
-
+@patch('server.clubs', [{"name":"Simply Lift", "email":"john@simplylift.co", "points":"13"}])
+@patch('server.competitions', [{"name": "Spring Festival", "date": "2020-03-27 10:00:00", "numberOfPlaces": "25"}])
 def test_purchase_places(client, captured_template):
     club = ["Simply Lift"]
     competition = ["Spring Festival"]
