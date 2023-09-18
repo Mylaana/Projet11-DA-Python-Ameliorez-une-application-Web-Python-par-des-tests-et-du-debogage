@@ -48,7 +48,11 @@ def purchasePlaces():
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
     pointsAvailable = int(club['points'])
-    
+
+    if placesRequired < 0:
+        flash('You can not book negative number of places !')
+        return render_template('welcome.html', club=club, competitions=competitions)
+
     # get the number of places already booked by club in selected competition
     alreadyBooked = 0
     for bookedByClub in competition['booked']:
