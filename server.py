@@ -2,30 +2,37 @@ import json
 from flask import Flask,render_template,request,redirect,flash,url_for
 
 
-def loadClubs():
+def loadClubs(returnFullJson=False):
     with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+         if returnFullJson:
+            return json.load(c)
+         return json.load(c)['clubs']
 
-def saveClubs():
-    with open('clubs.json', 'r+') as c:
-        json.dump(clubs, c)
-        listOfClubs = json.load(c)
-        listOfClubs['clubs'] = c
-        json.dump(listOfClubs, c)
-    loadClubs()
+def saveClubs(saveclub):
+    listOfClubs = loadClubs(True)
+    for club in listOfClubs['clubs']:
+        if club['name'] == saveclub['name']:
+            club.update(saveclub)
+            break
 
-def loadCompetitions():
+    with open('clubs.json', 'w') as c:
+        json.dump(listOfClubs, c, indent=4)
+
+def loadCompetitions(returnFullJson=False):
     with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+         if returnFullJson:
+            return json.load(comps)
+         return json.load(comps)['competitions']
 
-def saveCompetitions():
-    with open('competitions.json', 'r+') as comps:
-        listOfCompetitions = json.load(comps)
-        listOfCompetitions['competitions'] = competitions
-        json.dump(listOfCompetitions, comps)
-    loadCompetitions()
+def saveCompetitions(saveCompetition):
+    listOfCompetitions = loadCompetitions(True)
+    for competition in listOfCompetitions['competitions']:
+        if competition['name'] == saveCompetition['name']:
+            competition.update(saveCompetition)
+            break
+
+    with open('competitions.json', 'w') as comps:
+        json.dump(listOfCompetitions, comps, indent=4)
 
 
 app = Flask(__name__)
@@ -62,8 +69,8 @@ def purchasePlaces():
     placesRequired = int(request.form['places'])
     competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
     club['points'] = str(int(club['points']) - placesRequired)
-    saveCompetitions()
-    saveClubs()
+    saveCompetitions(competition)
+    saveClubs(club)
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 
