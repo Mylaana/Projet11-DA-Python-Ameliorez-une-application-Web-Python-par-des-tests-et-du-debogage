@@ -6,3 +6,4 @@ lib
 __pycache__
 /env/
 .coverage
+tests/notes
