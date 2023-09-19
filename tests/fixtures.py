@@ -1,5 +1,6 @@
 import server
 import pytest
+import json
 from flask import template_rendered
 
 """
@@ -20,6 +21,7 @@ def app():
     app.config['SERVER_NAME'] = 'localhost:5000'
     app.config['APPLICATION_ROOT'] = '/'
     app.config['PREFERRED_URL_SCHEME'] = 'http'
+    app.config['TESTING'] = True
     return app
 
 @pytest.fixture
@@ -41,3 +43,25 @@ def captured_template(app):
 @pytest.fixture
 def client(app):
     yield app.test_client()
+
+@pytest.fixture
+def revert_competitions_json():
+    # saving competitions JSON state before test
+    competitions = server.loadCompetitions(True)
+    
+    yield
+
+    # reverting competitions JSON to before test state
+    with open('competitions.json', 'w') as file:
+        json.dump(competitions, file, indent=4)
+
+@pytest.fixture
+def revert_clubs_json():
+    # saving clubs JSON state before test
+    clubs = server.loadClubs(True)
+    
+    yield
+
+    # reverting clubs JSON to before test state
+    with open('clubs.json', 'w') as file:
+        json.dump(clubs, file, indent=4)

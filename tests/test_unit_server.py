@@ -3,6 +3,7 @@ from unittest.mock import patch
 from flask import url_for
 import server
 from .fixtures import app, captured_template, client
+from .fixtures import app, captured_template, client, revert_competitions_json, revert_clubs_json
 from .settings import TEST_SAD_PATH
 
 
@@ -64,14 +65,13 @@ def test_showsummary(client, captured_template):
 
 @patch('server.clubs', [{"name":"Simply Lift", "email":"john@simplylift.co", "points":"13"}])
 @patch('server.competitions', [{"name": "Spring Festival", "date": "2020-03-27 10:00:00", "numberOfPlaces": "25"}])
-def test_book(client, captured_template):
+def test_book_past_competition(client, captured_template):
     response = client.get("book/Spring Festival/Simply Lift")
     template, context = captured_template[0]
+
     assert response.status_code == 200
     assert len(captured_template) == 1
-    assert template.name == "booking.html"
-    assert context['club']['name'] == 'Simply Lift'
-    assert context['competition']['name'] == 'Spring Festival'
+    assert template.name == "welcome.html"
 
 if TEST_SAD_PATH:
     @patch('server.clubs', [])
@@ -79,6 +79,7 @@ if TEST_SAD_PATH:
     def test_book_club_not_found(client):
         response = client.get("book/notfound/Simply Lift")
         assert response.status_code == 200
+
 
     @patch('server.clubs', [{"name":"Simply Lift", "email":"john@simplylift.co", "points":"13"}])
     @patch('server.competitions', [])
@@ -94,7 +95,7 @@ if TEST_SAD_PATH:
 
 @patch('server.clubs', [{"name":"Simply Lift", "email":"john@simplylift.co", "points":"13"}])
 @patch('server.competitions', [{"name": "Spring Festival", "date": "2020-03-27 10:00:00", "numberOfPlaces": "25"}])
-def test_purchase_places(client, captured_template):
+def test_purchase_places(client, captured_template, revert_competitions_json, revert_clubs_json):
     club = ["Simply Lift"]
     competition = ["Spring Festival"]
     places_before = 25
