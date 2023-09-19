@@ -1,4 +1,5 @@
-from locust import HttpUser, TaskSet, between, task
+"""docstring"""
+from locust import HttpUser, between, task
 import server
 import json
 
