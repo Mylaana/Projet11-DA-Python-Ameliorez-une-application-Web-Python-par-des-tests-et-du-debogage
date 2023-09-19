@@ -106,7 +106,7 @@ def test_purchase_places(client, captured_template):
 
     template, context = captured_template[0]
     assert response.status_code == 200
-    assert expected_value == context['competitions'][0]['numberOfPlaces']
+    assert str(expected_value) == context['competitions'][0]['numberOfPlaces']
     assert template.name == 'welcome.html'
 
 def test_logout(client, captured_template, app):

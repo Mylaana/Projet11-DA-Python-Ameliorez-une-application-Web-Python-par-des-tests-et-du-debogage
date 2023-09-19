@@ -22,9 +22,8 @@ def saveClubs(saveclub):
 
 def loadCompetitions(returnFullJson=False):
     with open('competitions.json') as comps:
-         if returnFullJson:
-            return json.load(comps)
-         return json.load(comps)['competitions']
+         listOfCompetitions = json.load(comps)['competitions']
+         return listOfCompetitions
 
 def saveCompetitions(saveCompetition):
     listOfCompetitions = loadCompetitions(True)
@@ -36,6 +35,11 @@ def saveCompetitions(saveCompetition):
     with open('competitions.json', 'w') as comps:
         json.dump(listOfCompetitions, comps, indent=4)
 
+def getpointsSummary(clubs):
+    pointsSummary = []
+    for club in clubs:
+        pointsSummary.append(f"{club['name']}: {club['points']}pts")
+    return pointsSummary
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
@@ -59,10 +63,10 @@ def showSummary():
         flash('Please enter a valid email')
         return render_template('index.html')
     
-    return render_template('welcome.html',club=found_club,competitions=competitions)
+    return render_template('welcome.html',club=found_club,competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
     # club = [club for club in clubs if club['email'] == request.form['email']][0]
-    # return render_template('welcome.html',club=club,competitions=competitions)
+    # return render_template('welcome.html',club=club,competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
 
 @app.route('/book/<competition>/<club>')
@@ -72,13 +76,13 @@ def book(competition,club):
 
     if datetime.now() > datetime.strptime(foundCompetition['date'], "%Y-%m-%d %H:%M:%S"):
         flash("You cannot book places for a past competition.")
-        return render_template('welcome.html', club=foundClub, competitions=competitions)
+        return render_template('welcome.html', club=foundClub, competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
     if foundClub and foundCompetition:
         return render_template('booking.html',club=foundClub,competition=foundCompetition)
     else:
         flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
 
 @app.route('/purchasePlaces',methods=['POST'])
@@ -91,12 +95,12 @@ def purchasePlaces():
     pointsAvailable = int(club['points'])
     if placesRequired < 0:
         flash('You can not book negative number of places !')
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
     
     # check if club has enough points
     if pointsAvailable < placesRequired:
         flash(f'You only have {pointsAvailable} points !')
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
     # get the number of places already booked by club in selected competition
     alreadyBooked = None
@@ -115,7 +119,7 @@ def purchasePlaces():
         remaining = MAXIMUM_PLACES_BOOKED_PER_CLUB - alreadyBooked
         flash(f'You can not book more than {MAXIMUM_PLACES_BOOKED_PER_CLUB} total places per competition,'
               f' you already booked {alreadyBooked}, you can book {remaining} additionnal.')
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
     competition['booked'][club['name']] = str(int(competition['booked'][club['name']]) + placesRequired)
     competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
@@ -123,7 +127,7 @@ def purchasePlaces():
     saveCompetitions(competition)
     saveClubs(club)
     flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
 
 # TODO: Add route for points display
