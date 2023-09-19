@@ -68,8 +68,8 @@ def purchasePlaces():
               f' you already booked {alreadyBooked}, you can book {remaining} additionnal.')
         return render_template('welcome.html', club=club, competitions=competitions)
 
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
-    competition['booked'][club['name']] = int(competition['booked'][club['name']]) + placesRequired
+    competition['numberOfPlaces'] = str(int(competition['numberOfPlaces']) - placesRequired)
+    competition['booked'][club['name']] = str(int(competition['booked'][club['name']]) + placesRequired)
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 
