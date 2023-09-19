@@ -117,7 +117,7 @@ def purchasePlaces():
               f' you already booked {alreadyBooked}, you can book {remaining} additionnal.')
         return render_template('welcome.html', club=club, competitions=competitions)
 
-    competition['booked'][club['name']] = int(competition['booked'][club['name']]) + placesRequired
+    competition['booked'][club['name']] = str(int(competition['booked'][club['name']]) + placesRequired)
     competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
     club['points'] = str(int(club['points']) - placesRequired)
     saveCompetitions(competition)
