@@ -3,16 +3,37 @@ from flask import Flask,render_template,request,redirect,flash,url_for
 
 MAXIMUM_PLACES_BOOKED_PER_CLUB = 12
 
-def loadClubs():
+def loadClubs(returnFullJson=False):
     with open('clubs.json') as c:
-         listOfClubs = json.load(c)['clubs']
-         return listOfClubs
+         if returnFullJson:
+            return json.load(c)
+         return json.load(c)['clubs']
 
+def saveClubs(saveclub):
+    listOfClubs = loadClubs(True)
+    for club in listOfClubs['clubs']:
+        if club['name'] == saveclub['name']:
+            club.update(saveclub)
+            break
 
-def loadCompetitions():
+    with open('clubs.json', 'w') as c:
+        json.dump(listOfClubs, c, indent=4)
+
+def loadCompetitions(returnFullJson=False):
     with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+         if returnFullJson:
+            return json.load(comps)
+         return json.load(comps)['competitions']
+
+def saveCompetitions(saveCompetition):
+    listOfCompetitions = loadCompetitions(True)
+    for competition in listOfCompetitions['competitions']:
+        if competition['name'] == saveCompetition['name']:
+            competition.update(saveCompetition)
+            break
+
+    with open('competitions.json', 'w') as comps:
+        json.dump(listOfCompetitions, comps, indent=4)
 
 
 app = Flask(__name__)
@@ -74,8 +95,11 @@ def purchasePlaces():
               f' you already booked {alreadyBooked}, you can book {remaining} additionnal.')
         return render_template('welcome.html', club=club, competitions=competitions)
 
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
     competition['booked'][club['name']] = int(competition['booked'][club['name']]) + placesRequired
+    competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
+    club['points'] = str(int(club['points']) - placesRequired)
+    saveCompetitions(competition)
+    saveClubs(club)
     flash('Great-booking complete!')
     print(competition)
     return render_template('welcome.html', club=club, competitions=competitions)
