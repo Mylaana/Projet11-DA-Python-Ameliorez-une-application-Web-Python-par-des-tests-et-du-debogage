@@ -13,6 +13,11 @@ def loadCompetitions():
          listOfCompetitions = json.load(comps)['competitions']
          return listOfCompetitions
 
+def getpointsSummary(clubs):
+    pointsSummary = []
+    for club in clubs:
+        pointsSummary.append(f"{club['name']}: {club['points']}pts")
+    return pointsSummary
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
@@ -27,7 +32,7 @@ def index():
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
     club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    return render_template('welcome.html',club=club,competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
 
 @app.route('/book/<competition>/<club>')
@@ -38,7 +43,7 @@ def book(competition,club):
         return render_template('booking.html',club=foundClub,competition=foundCompetition)
     else:
         flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
 
 @app.route('/purchasePlaces',methods=['POST'])
@@ -48,7 +53,7 @@ def purchasePlaces():
     placesRequired = int(request.form['places'])
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
     flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
 
 # TODO: Add route for points display
