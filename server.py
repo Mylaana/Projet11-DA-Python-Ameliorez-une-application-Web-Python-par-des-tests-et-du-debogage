@@ -51,8 +51,12 @@ def purchasePlaces():
     # get the number of places already booked by club in selected competition
 
     alreadyBooked = None
-    if 'booked' not in competition or club['name'] not in competition['booked']:
+    if 'booked' not in competition:
         competition['booked'] = {club['name']: "0"}
+        alreadyBooked = 0
+
+    if club['name'] not in competition['booked']:
+        competition['booked'][club['name']] =  "0"
         alreadyBooked = 0
 
     if alreadyBooked is None:
@@ -67,7 +71,6 @@ def purchasePlaces():
     competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
     competition['booked'][club['name']] = int(competition['booked'][club['name']]) + placesRequired
     flash('Great-booking complete!')
-    print(competition)
     return render_template('welcome.html', club=club, competitions=competitions)
 
 # TODO: Add route for points display
