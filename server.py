@@ -22,8 +22,9 @@ def saveClubs(saveclub):
 
 def loadCompetitions(returnFullJson=False):
     with open('competitions.json') as comps:
-         listOfCompetitions = json.load(comps)['competitions']
-         return listOfCompetitions
+         if returnFullJson:
+            return json.load(comps)
+         return json.load(comps)['competitions']
 
 def saveCompetitions(saveCompetition):
     listOfCompetitions = loadCompetitions(True)
