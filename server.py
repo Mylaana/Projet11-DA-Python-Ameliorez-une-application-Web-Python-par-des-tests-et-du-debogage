@@ -49,9 +49,17 @@ def purchasePlaces():
     placesRequired = int(request.form['places'])
 
     # get the number of places already booked by club in selected competition
+
     alreadyBooked = 0
+    if 'booked' not in competition:
+        competition['booked'] = [{"name":club['name'], "numberOfPlaces": "0"}]
+    
+    print(club['name'])
+    print(competition['booked'])
+    
     for bookedByClub in competition['booked']:
-        if bookedByClub['name'] == club:
+        print(bookedByClub)
+        if bookedByClub['name'] == club['name']:
             alreadyBooked = int(bookedByClub['numberOfPlaces'])
             break
 
