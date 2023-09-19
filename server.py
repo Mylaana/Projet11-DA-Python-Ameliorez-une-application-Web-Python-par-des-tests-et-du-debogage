@@ -53,21 +53,8 @@ def purchasePlaces():
         flash('You can not book negative number of places !')
         return render_template('welcome.html', club=club, competitions=competitions)
 
-    # get the number of places already booked by club in selected competition
-    alreadyBooked = 0
-    for bookedByClub in competition['booked']:
-        if bookedByClub['name'] == club:
-            alreadyBooked = int(bookedByClub['numberOfPlaces'])
-            break
-
     if pointsAvailable < placesRequired:
         flash(f'You only have {pointsAvailable} points !')
-        return render_template('welcome.html', club=club, competitions=competitions)
-
-    if placesRequired + alreadyBooked > MAXIMUM_PLACES_BOOKED_PER_CLUB:
-        remaining = MAXIMUM_PLACES_BOOKED_PER_CLUB - alreadyBooked
-        flash(f'You can not book more than {MAXIMUM_PLACES_BOOKED_PER_CLUB} total places per competition,'
-              f' you already booked {alreadyBooked}, you can book {remaining} additionnal.')
         return render_template('welcome.html', club=club, competitions=competitions)
 
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
