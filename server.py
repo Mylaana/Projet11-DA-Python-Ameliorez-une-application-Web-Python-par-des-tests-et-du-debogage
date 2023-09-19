@@ -50,25 +50,25 @@ def purchasePlaces():
 
     # get the number of places already booked by club in selected competition
 
-    alreadyBooked = 0
-    if 'booked' not in competition:
-        competition['booked'] = [{"name":club['name'], "numberOfPlaces": "0"}]
-    
-    print(club['name'])
-    print(competition['booked'])
-    
-    for bookedByClub in competition['booked']:
-        print(bookedByClub)
-        if bookedByClub['name'] == club['name']:
-            alreadyBooked = int(bookedByClub['numberOfPlaces'])
-            break
+    alreadyBooked = None
+    if 'booked' not in competition or club['name'] not in competition['booked']:
+        competition['booked'] = {club['name']: "0"}
+        alreadyBooked = 0
 
+    if alreadyBooked is None:
+        alreadyBooked = int(competition['booked'][club['name']])
+    
     if placesRequired + alreadyBooked > MAXIMUM_PLACES_BOOKED_PER_CLUB:
         remaining = MAXIMUM_PLACES_BOOKED_PER_CLUB - alreadyBooked
         flash(f'You can not book more than {MAXIMUM_PLACES_BOOKED_PER_CLUB} total places per competition,'
               f' you already booked {alreadyBooked}, you can book {remaining} additionnal.')
         return render_template('welcome.html', club=club, competitions=competitions)
 
+    competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
+    competition['booked'][club['name']] = int(competition['booked'][club['name']]) + placesRequired
+    flash('Great-booking complete!')
+    print(competition)
+    return render_template('welcome.html', club=club, competitions=competitions)
 
 # TODO: Add route for points display
 
