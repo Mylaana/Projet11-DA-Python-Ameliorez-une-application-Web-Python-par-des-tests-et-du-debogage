@@ -89,9 +89,6 @@ def book(competition,club):
         flash("Something went wrong-please try again")
         return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
-    print(foundCompetition)
-    print(foundClub)
-
     if datetime.now() > datetime.strptime(foundCompetition['date'], "%Y-%m-%d %H:%M:%S"):
         flash("You cannot book places for a past competition.")
         return render_template('welcome.html', club=foundClub, competitions=competitions, pointsSummary=getpointsSummary(clubs))

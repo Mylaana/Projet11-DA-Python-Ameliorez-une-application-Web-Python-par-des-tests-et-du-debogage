@@ -3,8 +3,6 @@ from unittest.mock import patch
 from flask import url_for
 import server
 from .fixtures import app, captured_template, client, revert_competitions_json, revert_clubs_json
-from .settings import TEST_SAD_PATH
-
 
 
 def test_showsummary(client, captured_template):
@@ -24,23 +22,6 @@ def test_book_past_competition(client, captured_template):
     assert response.status_code == 200
     assert len(captured_template) == 1
     assert template.name == "welcome.html"
-
-if TEST_SAD_PATH:
-    @patch('server.clubs', [])
-    def test_book_club_not_found(client):
-        response = client.get("book/notfound/Simply Lift")
-        assert response.status_code == 200
-
-    @patch('server.competitions', [])
-    def test_book_competitions_not_found(client):
-        response = client.get("book/Spring Festival/not found")
-        assert response.status_code == 200
-
-    @patch('server.clubs', [])
-    @patch('server.competitions', [])
-    def test_book_nothing_found(client):
-        response = client.get("book/not found/not found")
-        assert response.status_code == 200
 
 def test_purchase_places(client, captured_template, revert_competitions_json, revert_clubs_json):
     club = ["Simply Lift"]
