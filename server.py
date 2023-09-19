@@ -100,8 +100,12 @@ def purchasePlaces():
 
     # get the number of places already booked by club in selected competition
     alreadyBooked = None
-    if 'booked' not in competition or club['name'] not in competition['booked']:
+    if 'booked' not in competition:
         competition['booked'] = {club['name']: "0"}
+        alreadyBooked = 0
+
+    if club['name'] not in competition['booked']:
+        competition['booked'][club['name']] =  "0"
         alreadyBooked = 0
 
     if alreadyBooked is None:
@@ -119,7 +123,6 @@ def purchasePlaces():
     saveCompetitions(competition)
     saveClubs(club)
     flash('Great-booking complete!')
-    print(competition)
     return render_template('welcome.html', club=club, competitions=competitions)
 
 
