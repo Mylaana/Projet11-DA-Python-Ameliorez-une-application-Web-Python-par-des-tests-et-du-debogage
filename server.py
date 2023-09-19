@@ -6,9 +6,9 @@ MAXIMUM_PLACES_BOOKED_PER_CLUB = 12
 
 def loadClubs(returnFullJson=False):
     with open('clubs.json') as c:
-         if returnFullJson:
+        if returnFullJson:
             return json.load(c)
-         return json.load(c)['clubs']
+        return json.load(c)['clubs']
 
 def saveClubs(saveclub):
     listOfClubs = loadClubs(True)
@@ -22,9 +22,9 @@ def saveClubs(saveclub):
 
 def loadCompetitions(returnFullJson=False):
     with open('competitions.json') as comps:
-         if returnFullJson:
+        if returnFullJson:
             return json.load(comps)
-         return json.load(comps)['competitions']
+        return json.load(comps)['competitions']
 
 def saveCompetitions(saveCompetition):
     listOfCompetitions = loadCompetitions(True)
@@ -63,12 +63,9 @@ def showSummary():
     if found_club is None:
         flash('Please enter a valid email')
         return render_template('index.html')
-    
-    return render_template('welcome.html',club=found_club,competitions=competitions, pointsSummary=getpointsSummary(clubs))
 
-    # club = [club for club in clubs if club['email'] == request.form['email']][0]
-    # return render_template('welcome.html',club=club,competitions=competitions, pointsSummary=getpointsSummary(clubs))
-
+    return render_template('welcome.html',club=found_club,competitions=competitions,
+                           pointsSummary=getpointsSummary(clubs))
 
 @app.route('/book/<competition>/<club>')
 def book(competition,club):
@@ -87,11 +84,13 @@ def book(competition,club):
 
     if not (foundClub and foundCompetition):
         flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
+        return render_template('welcome.html', club=club, competitions=competitions,
+                               pointsSummary=getpointsSummary(clubs))
 
     if datetime.now() > datetime.strptime(foundCompetition['date'], "%Y-%m-%d %H:%M:%S"):
         flash("You cannot book places for a past competition.")
-        return render_template('welcome.html', club=foundClub, competitions=competitions, pointsSummary=getpointsSummary(clubs))
+        return render_template('welcome.html', club=foundClub, competitions=competitions,
+                               pointsSummary=getpointsSummary(clubs))
 
     return render_template('booking.html',club=foundClub,competition=foundCompetition)
 
@@ -105,12 +104,14 @@ def purchasePlaces():
     pointsAvailable = int(club['points'])
     if placesRequired < 0:
         flash('You can not book negative number of places !')
-        return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
-    
+        return render_template('welcome.html', club=club, competitions=competitions,
+                               pointsSummary=getpointsSummary(clubs))
+
     # check if club has enough points
     if pointsAvailable < placesRequired:
         flash(f'You only have {pointsAvailable} points !')
-        return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
+        return render_template('welcome.html', club=club, competitions=competitions,
+                               pointsSummary=getpointsSummary(clubs))
 
     # get the number of places already booked by club in selected competition
     alreadyBooked = None
@@ -124,12 +125,13 @@ def purchasePlaces():
 
     if alreadyBooked is None:
         alreadyBooked = int(competition['booked'][club['name']])
-    
+
     if placesRequired + alreadyBooked > MAXIMUM_PLACES_BOOKED_PER_CLUB:
         remaining = MAXIMUM_PLACES_BOOKED_PER_CLUB - alreadyBooked
         flash(f'You can not book more than {MAXIMUM_PLACES_BOOKED_PER_CLUB} total places per competition,'
               f' you already booked {alreadyBooked}, you can book {remaining} additionnal.')
-        return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
+        return render_template('welcome.html', club=club, competitions=competitions,
+                               pointsSummary=getpointsSummary(clubs))
 
     competition['booked'][club['name']] = str(int(competition['booked'][club['name']]) + placesRequired)
     competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
@@ -138,10 +140,6 @@ def purchasePlaces():
     saveClubs(club)
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions, pointsSummary=getpointsSummary(clubs))
-
-
-# TODO: Add route for points display
-
 
 @app.route('/logout')
 def logout():
