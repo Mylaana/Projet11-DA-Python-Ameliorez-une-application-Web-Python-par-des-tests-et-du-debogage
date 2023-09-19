@@ -62,9 +62,9 @@ def test_showsummary(client, captured_template):
     assert context['competitions'][0]['name'] == 'Spring Festival'
 
 @patch('server.clubs', [{"name":"Simply Lift", "email":"john@simplylift.co", "points":"13"}])
-@patch('server.competitions', [{"name": "fake competition", "date": "2050-01-31 00:00:00", "numberOfPlaces": "1"}])
+@patch('server.competitions', [{"name": "Fake Competition", "date": "2050-01-31 00:00:00", "numberOfPlaces": "10"}])
 def test_book_should_render_booking(client, captured_template):
-    response = client.get("book/fake competition/Simply Lift")
+    response = client.get("book/Fake Competition/Simply Lift")
     template, context = captured_template[0]
 
     assert response.status_code == 200

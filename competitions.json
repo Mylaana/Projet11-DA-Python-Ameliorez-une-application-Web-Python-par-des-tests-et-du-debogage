@@ -9,6 +9,11 @@
             "name": "Fall Classic",
             "date": "2020-10-22 13:30:00",
             "numberOfPlaces": "13"
+        },
+        {
+            "name": "Fake Competition",
+            "date": "2050-01-31 00:00:00",
+            "numberOfPlaces": "10"
         }
     ]
 }
