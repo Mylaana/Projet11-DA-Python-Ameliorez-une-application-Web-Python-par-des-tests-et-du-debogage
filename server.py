@@ -102,6 +102,8 @@ def purchasePlaces():
 
     # check if not trying to buy negative number of places
     pointsAvailable = int(club['points'])
+    placesAvailable = int(competition['numberOfPlaces'])
+
     if placesRequired < 0:
         flash('You can not book negative number of places !')
         return render_template('welcome.html', club=club, competitions=competitions,
@@ -112,6 +114,10 @@ def purchasePlaces():
         flash(f'You only have {pointsAvailable} points !')
         return render_template('welcome.html', club=club, competitions=competitions,
                                pointsSummary=getpointsSummary(clubs))
+
+    if placesAvailable < placesRequired:
+        flash(f'Not enough places available, you can book up to {placesAvailable}.')
+        return render_template('welcome.html', club=club, competitions=competitions)
 
     # get the number of places already booked by club in selected competition
     alreadyBooked = None
