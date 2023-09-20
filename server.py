@@ -117,7 +117,8 @@ def purchasePlaces():
 
     if placesAvailable < placesRequired:
         flash(f'Not enough places available, you can book up to {placesAvailable}.')
-        return render_template('welcome.html', club=club, competitions=competitions)
+        return render_template('welcome.html', club=club, competitions=competitions,
+                               pointsSummary=getpointsSummary(clubs))
 
     # get the number of places already booked by club in selected competition
     alreadyBooked = None
