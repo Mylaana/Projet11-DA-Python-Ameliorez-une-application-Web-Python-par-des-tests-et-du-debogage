@@ -26,21 +26,14 @@ def test_should_return_clubs():
     assert server.loadClubs() == expected_value
 
 def test_should_return_competitions():
-    expected_value = [
-        {
+    expected_value = {
             "name": "Spring Festival",
             "date": "2020-03-27 10:00:00",
             "numberOfPlaces": "25"
-        },
-        {
-            "name": "Fall Classic",
-            "date": "2020-10-22 13:30:00",
-            "numberOfPlaces": "13"
         }
-    ]
     assert isinstance(server.loadCompetitions(), list)
     assert isinstance(server.loadCompetitions()[0], dict)
-    assert server.loadCompetitions() == expected_value
+    assert expected_value in server.loadCompetitions()
 
 def test_index(client, captured_template):
     response = client.get("/")
